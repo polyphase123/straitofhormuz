@@ -405,6 +405,70 @@
                         <span class="stat-value orange" id="out-v-dieselmax" style="font-size: 1.1rem;">₱0.00</span>
                     </div>
 
+                    <!-- BRAND SPECIFIC ESTIMATES -->
+                    <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border);">
+                        <label
+                            style="color: var(--brand-accent1); font-size: 0.75rem; display: block; margin-bottom: 0.5rem;">BRAND
+                            IMPACT: DAY 1 EST.</label>
+                        <div style="overflow-x: auto;">
+                            <table
+                                style="width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: right;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                                        <th style="text-align: left; padding: 0.2rem;">Brand</th>
+                                        <th style="padding: 0.2rem;">RON91</th>
+                                        <th style="padding: 0.2rem;">RON95</th>
+                                        <th style="padding: 0.2rem;">Diesel</th>
+                                        <th style="padding: 0.2rem;">D.Max</th>
+                                        <th style="padding: 0.2rem;">Kero</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px dotted rgba(0,0,0,0.1);">
+                                        <td
+                                            style="text-align: left; padding: 0.2rem; font-weight: bold; color: #dc2626;">
+                                            Shell (60%)</td>
+                                        <td id="b-shell-91">₱0.00</td>
+                                        <td id="b-shell-95">₱0.00</td>
+                                        <td id="b-shell-die">₱0.00</td>
+                                        <td id="b-shell-dmax">₱0.00</td>
+                                        <td id="b-shell-kero">₱0.00</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px dotted rgba(0,0,0,0.1);">
+                                        <td
+                                            style="text-align: left; padding: 0.2rem; font-weight: bold; color: #2563eb;">
+                                            Petron (60%)</td>
+                                        <td id="b-petron-91">₱0.00</td>
+                                        <td id="b-petron-95">₱0.00</td>
+                                        <td id="b-petron-die">₱0.00</td>
+                                        <td id="b-petron-dmax">₱0.00</td>
+                                        <td id="b-petron-kero">₱0.00</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px dotted rgba(0,0,0,0.1);">
+                                        <td
+                                            style="text-align: left; padding: 0.2rem; font-weight: bold; color: #16a34a;">
+                                            Jetti (33%)</td>
+                                        <td id="b-jetti-91">₱0.00</td>
+                                        <td id="b-jetti-95">₱0.00</td>
+                                        <td id="b-jetti-die">₱0.00</td>
+                                        <td id="b-jetti-dmax">₱0.00</td>
+                                        <td id="b-jetti-kero">₱0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                            style="text-align: left; padding: 0.2rem; font-weight: bold; color: #d97706;">
+                                            Total (50%)</td>
+                                        <td id="b-total-91">₱0.00</td>
+                                        <td id="b-total-95">₱0.00</td>
+                                        <td id="b-total-die">₱0.00</td>
+                                        <td id="b-total-dmax">₱0.00</td>
+                                        <td id="b-total-kero">₱0.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <div style="margin-top: 0.75rem; border-top: 1px dashed var(--border); padding-top: 0.75rem;">
                         <span
                             style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold;">Selected
@@ -445,15 +509,20 @@
 
                 <div style="border-top: 1px solid var(--border); padding-top: 1.25rem;">
                     <label>Staggered Implementation <span class="tooltip">ℹ️<span class="tooltiptext">DOE coordinating
-                                to delay full rollout of price hikes.</span></span></label>
+                                to delay full rollout of price hikes based on the March 10 Advisory
+                                models.</span></span></label>
                     <select id="sim-staggered" onchange="calculateAll()"
-                        style="margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.1); border-color: var(--brand-safe); color: var(--brand-safe); font-weight: 600;">
+                        style="margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.1); border-color: var(--brand-safe); color: var(--brand-safe); font-weight: 600; width: 100%;">
                         <option value="1.0">No Delay (Full Hit Today)</option>
-                        <option value="0.5">Spread over 2 Weeks (50% hit)</option>
-                        <option value="0.25">Spread over 4 Weeks (25% hit)</option>
+                        <option value="total_2day">Total/Seaoil Model (2 Days: 50% / 50%)</option>
+                        <option value="petron_3day">Petron Model (3 Days: 60% / 20% / 20%)</option>
+                        <option value="shell_3day">Shell Model (3 Days: 60% / 30% / 10%)</option>
+                        <option value="jetti_4day">Jetti Model (4 Days: 33% / 33% / 17% / 17%)</option>
                     </select>
-                    <div class="tag green" id="staggered-save" style="display: block; text-align: center;">Consumer
-                        Shielded: ₱0.00/L</div>
+                    <div id="staggered-save" style="margin-top: 0.25rem;">
+                        <div class="tag green" style="display: block; text-align: center;">Consumer Shielded: ₱0.00/L
+                        </div>
+                    </div>
                 </div>
 
                 <div
@@ -496,6 +565,16 @@
             <!-- SECTION 1: STRAIT OF HORMUZ CRISIS (THE CORE) -->
             <div class="card crisis-card">
                 <h1 class="crisis">I. Strait of Hormuz Geopolitical Event Simulator</h1>
+
+                <div
+                    style="background: rgba(2ef, 68, 68, 0.05); border: 1px solid #ef4444; border-left: 4px solid #ef4444; border-radius: 4px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.85rem; line-height: 1.4;">
+                    <strong style="color: #ef4444; font-size: 0.9rem;">⚠️ LIVE STATUS UPDATE (March 2026):</strong>
+                    <span style="color: var(--brand-dark);">Traffic through the Strait of Hormuz has <strong>plummeted
+                            by 93%</strong>. Routine commercial transits have dropped from an average of ~138
+                        vessels/day down to merely 2-10 per day due to the critical threat environment and war-risk
+                        insurance premiums surging up to 200%.</span>
+                </div>
+
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Roughly one-fifth of global
                     oil supply and 98% of Philippine Middle-Eastern crude imports transit the Strait. Simulate the
                     escalating closure event and its devastating multiplier effects.</p>
@@ -508,7 +587,7 @@
                             <option value="0,0">Open (Normal Operations)</option>
                             <option value="0.25,5">Partial Disruption (Harassment) [+$5/bbl]</option>
                             <option value="0.50,15">Heavy Military Disruption [+$15/bbl]</option>
-                            <option value="1.0,40">Full Closure (Catastrophic) [+$40/bbl]</option>
+                            <option value="1.0,40" selected>Full Closure (Catastrophic) [+$40/bbl]</option>
                         </select>
                     </div>
 
@@ -930,7 +1009,16 @@
             const grossRetail = landedPerLiter - wholesaleDisc + dealerRent;
 
             // Staggered DOE Implementation
-            const stagPct = parseFloat(document.getElementById('sim-staggered').value);
+            const stagVal = document.getElementById('sim-staggered').value;
+            let stagPct = 1.0;
+            let splitRates = [];
+            if (stagVal === "total_2day") { stagPct = 0.50; splitRates = [0.50, 0.50]; }
+            else if (stagVal === "petron_3day") { stagPct = 0.60; splitRates = [0.60, 0.20, 0.20]; }
+            else if (stagVal === "shell_3day") { stagPct = 0.60; splitRates = [0.60, 0.30, 0.10]; }
+            else if (stagVal === "jetti_4day") { stagPct = 0.33; splitRates = [0.33, 0.33, 0.17, 0.17]; }
+            else if (stagVal === "0.5") { stagPct = 0.5; } // Keep backwards comp
+            else if (stagVal === "0.25") { stagPct = 0.25; }
+
             // Dynamic Baseline Mapping to emulate standard pre-shock pricing based on DOE lower bounds
             let baselineNorm = 55.00;
             if (prodType === 'gas91') baselineNorm = 49.00;
@@ -946,9 +1034,28 @@
                 const allowedHike = hikeAmount * stagPct;
                 visibleRetail = baselineNorm + allowedHike;
                 unrecoveredMargin = hikeAmount - allowedHike;
-            }
 
-            document.getElementById('staggered-save').innerText = `Consumer Shielded: ₱${Math.max(0, unrecoveredMargin).toFixed(2)}/L`;
+                if (splitRates.length > 0) {
+                    let bHtml = `<div style="padding:0.75rem; border:2px solid var(--brand-dark); border-radius:6px; font-size:0.75rem; background:#fff;">
+                                    <div style="font-weight:900; color:var(--brand-dark); margin-bottom:0.5rem; text-align:center; font-size:0.7rem;">DOE ADVISORY: STAGGERED IMPLEMENTATION</div>`;
+                    let cumulativeHike = 0;
+                    splitRates.forEach((rate, idx) => {
+                        const dayHike = hikeAmount * rate;
+                        cumulativeHike += dayHike;
+                        const dayPump = baselineNorm + cumulativeHike;
+                        bHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                                    <span style="font-weight:bold;">Day ${idx + 1} (+₱${dayHike.toFixed(2)})</span>
+                                    <span style="font-weight:800; color:var(--brand-accent1);">₱${dayPump.toFixed(2)}</span>
+                                  </div>`;
+                    });
+                    bHtml += `</div>`;
+                    document.getElementById('staggered-save').innerHTML = bHtml;
+                } else {
+                    document.getElementById('staggered-save').innerHTML = `<div class="tag green" style="display: block; text-align: center;">Consumer Shielded: ₱${Math.max(0, unrecoveredMargin).toFixed(2)}/L</div>`;
+                }
+            } else {
+                document.getElementById('staggered-save').innerHTML = `<div class="tag green" style="display: block; text-align: center;">Consumer Shielded: ₱0.00/L</div>`;
+            }
 
             const calcPumpVar = (pmops, pexc, ptype) => {
                 let p_spotUsd = pmops + qualityPremium + activeSqueeze - pnocOffset + spaPremium + windowRisk + altDiscount;
@@ -974,9 +1081,12 @@
                 if (ptype === 'gas91') p_base = 49.00;
                 if (ptype === 'gas95') p_base = 50.00;
                 if (ptype === 'gas97') p_base = 52.00;
-                if (ptype === 'diesel') p_base = 49.00;
-                if (ptype === 'dieselmax') p_base = 54.00;
+                if (ptype === 'diesel' || ptype === 'diesel_raw') p_base = 49.00;
+                if (ptype === 'dieselmax' || ptype === 'dieselmax_raw') p_base = 54.00;
+                if (ptype === 'kero_raw') p_base = 70.00;
+
                 let p_hike = p_grossRetail - p_base;
+                if (ptype.includes('raw')) return p_grossRetail;
                 return (p_hike > 0 && stagPct < 1.0) ? (p_base + p_hike * stagPct) : p_grossRetail;
             };
 
@@ -985,6 +1095,28 @@
             if (document.getElementById('out-v-gas97')) document.getElementById('out-v-gas97').innerText = `₱${calcPumpVar(115.40, 10.00, 'gas97').toFixed(2)}`;
             if (document.getElementById('out-v-diesel')) document.getElementById('out-v-diesel').innerText = `₱${calcPumpVar(118.02, 6.00, 'diesel').toFixed(2)}`;
             if (document.getElementById('out-v-dieselmax')) document.getElementById('out-v-dieselmax').innerText = `₱${calcPumpVar(122.50, 6.00, 'dieselmax').toFixed(2)}`;
+
+            // Brand Specific Day 1 Estimates
+            if (document.getElementById('b-shell-91')) {
+                const h91 = Math.max(0, calcPumpVar(95.34, 10.00, 'gas91_raw') - 49.00);
+                const h95 = Math.max(0, calcPumpVar(110.20, 10.00, 'gas95_raw') - 50.00);
+                const hDie = Math.max(0, calcPumpVar(118.02, 6.00, 'diesel_raw') - 49.00);
+                const hDMax = Math.max(0, calcPumpVar(122.50, 6.00, 'dieselmax_raw') - 54.00);
+                const hKero = Math.max(0, calcPumpVar(120.00, 6.00, 'kero_raw') - 70.00); // Using 120 as proxy for kero MOPS
+
+                const fillBrand = (prefix, pct) => {
+                    document.getElementById(prefix + '-91').innerText = `₱${(49.00 + (h91 * pct)).toFixed(2)}`;
+                    document.getElementById(prefix + '-95').innerText = `₱${(50.00 + (h95 * pct)).toFixed(2)}`;
+                    document.getElementById(prefix + '-die').innerText = `₱${(49.00 + (hDie * pct)).toFixed(2)}`;
+                    document.getElementById(prefix + '-dmax').innerText = `₱${(54.00 + (hDMax * pct)).toFixed(2)}`;
+                    document.getElementById(prefix + '-kero').innerText = `₱${(70.00 + (hKero * pct)).toFixed(2)}`;
+                };
+
+                fillBrand('b-shell', 0.60);
+                fillBrand('b-petron', 0.60);
+                fillBrand('b-total', 0.50);
+                fillBrand('b-jetti', 0.33);
+            }
 
             document.getElementById('out-landed').innerText = `₱${visibleRetail.toFixed(2)} / L`;
             document.getElementById('out-cif-bbl').innerText = `$${(cifUsd / totalVolBbl).toFixed(2)}/bbl`;
