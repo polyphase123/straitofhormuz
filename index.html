@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetroTrade Nexus - Hormuz Crisis Command Center (50+ Features)</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            --brand-dark: #0F172A;
+            --brand-accent1: #EA580C;
+            /* Replaced Red with Deep Orange */
+            /* Crisis Orange */
+            --brand-accent2: #F59E0B;
+            /* Warning Amber */
+            --brand-safe: #10B981;
+            /* Safe Emerald */
+            --grad-primary: linear-gradient(135deg, var(--brand-dark), #334155);
+            --grad-crisis: linear-gradient(135deg, var(--brand-accent1), #B45309);
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-md: 12px;
+            --radius-sm: 6px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--brand-dark);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            background: var(--grad-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            color: var(--brand-accent1);
+        }
+
+        h1.crisis {
+            background: var(--grad-crisis);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--brand-accent1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+        }
+
+        .logo span {
+            background: var(--grad-crisis);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .layout {
+            display: flex;
+            gap: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .sidebar {
+            flex: 0 0 320px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-width: 0;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--brand-dark);
+        }
+
+        .card.crisis-card::before {
+            background: var(--brand-accent1);
+        }
+
+        .card.gov-card::before {
+            background: var(--brand-safe);
+        }
+
+        .sticky-widget {
+            position: sticky;
+            top: 80px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 0.5rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: #fff;
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--brand-accent1);
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+        }
+
+        button.btn-primary {
+            background: var(--brand-dark);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button.btn-accent {
+            background: var(--brand-accent1);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-family: 'Outfit';
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            line-height: 1.1;
+        }
+
+        .stat-value.orange {
+            color: var(--brand-accent1);
+        }
+
+        .stat-value.green {
+            color: var(--brand-safe);
+        }
+
+        .slider-cont {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .slider-cont input[type=range] {
+            flex: 1;
+            accent-color: var(--brand-accent1);
+        }
+
+        .tag {
+            padding: 0.25rem 0.5rem;
+            background: var(--border);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .tag.orange {
+            background: rgba(234, 88, 12, 0.1);
+            color: var(--brand-accent1);
+        }
+
+        .tag.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--brand-safe);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--text-muted);
+            cursor: help;
+            color: var(--brand-dark);
+            font-weight: 600;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 260px;
+            background: var(--brand-dark);
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 100;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        @media (max-width: 1200px) {
+            .layout {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                flex: none;
+                width: 100%;
+                position: static;
+                margin-bottom: 1rem;
+            }
+
+            .sticky-widget {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3,
+            .grid-4,
+            .grid-5 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <div class="logo">PetroTrade <span>Hormuz Crisis Console</span></div>
+            <div style="font-size: 0.8rem; color: #cc0000; opacity: 0.8; font-weight: 700; margin-top: 0.2rem;">By:
+                Engr. Franz Xyrlo I. Tobias, PEE</div>
+        </div>
+        <div style="font-weight: 500; color: var(--text-muted); font-size: 0.85rem;">Philippine Market Simulator | 50
+            Active Parameters</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT SIDEBAR: Tracker -->
+        <aside class="sidebar">
+            <div class="card sticky-widget crisis-card">
+                <h2>Live Crisis Impact Map</h2>
+
+                <div style="margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border);">
+                    <label>Pump Est. (Metro Manila)</label>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gasoline RON
+                            91</span> <span class="stat-value orange" id="out-v-gas91"
+                            style="font-size: 1.1rem;">₱0.00</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gasoline RON
+                            95</span> <span class="stat-value orange" id="out-v-gas95"
+                            style="font-size: 1.1rem;">₱0.00</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gasoline RON
+                            97</span> <span class="stat-value orange" id="out-v-gas97"
+                            style="font-size: 1.1rem;">₱0.00</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Diesel</span>
+                        <span class="stat-value orange" id="out-v-diesel" style="font-size: 1.1rem;">₱0.00</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Diesel Max</span>
+                        <span class="stat-value orange" id="out-v-dieselmax" style="font-size: 1.1rem;">₱0.00</span>
+                    </div>
+
+                    <div style="margin-top: 0.75rem; border-top: 1px dashed var(--border); padding-top: 0.75rem;">
+                        <span
+                            style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold;">Selected
+                            Base Product:</span>
+                        <div class="stat-value" id="out-landed" style="font-size: 1.25rem; margin-top: 0.2rem;">₱0.00 /
+                            L</div>
+                        <div
+                            style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-top: 0.1rem;">
+                            CIF Focus: <span id="out-cif-bbl">$0.00/bbl</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label>Jeepney Driver Daily Delta <span class="tooltip">ℹ️<span class="tooltiptext">Extra daily
+                                outbound fuel expense per PUJ driver assuming standard 30 liters/day
+                                consumption.</span></span></label>
+                    <div class="stat-value" id="jeepney-impact" style="font-size: 1.4rem;">₱0.00</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 0.25rem;">
+                        Est. Pantawid Pasada Need: <span id="pantawid-tracker"
+                            style="color:var(--brand-accent1)">₱0M/month</span></div>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label>MERALCO Gen. Charge Ripple</label>
+                    <div class="stat-value orange" id="meralco-impact" style="font-size: 1.4rem;">+₱0.00 / kWh</div>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label>Inflation Cascade (CPI)</label>
+                    <div class="stat-value" id="inflation-cpi" style="font-size: 1.4rem;">+0.00%</div>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label>SPR Depletion Countdown</label>
+                    <div class="stat-value" id="spr-countdown" style="font-size: 1.2rem; color:var(--text-muted);">
+                        Inactive</div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border); padding-top: 1.25rem;">
+                    <label>Staggered Implementation <span class="tooltip">ℹ️<span class="tooltiptext">DOE coordinating
+                                to delay full rollout of price hikes.</span></span></label>
+                    <select id="sim-staggered" onchange="calculateAll()"
+                        style="margin-bottom: 0.5rem; background: rgba(16, 185, 129, 0.1); border-color: var(--brand-safe); color: var(--brand-safe); font-weight: 600;">
+                        <option value="1.0">No Delay (Full Hit Today)</option>
+                        <option value="0.5">Spread over 2 Weeks (50% hit)</option>
+                        <option value="0.25">Spread over 4 Weeks (25% hit)</option>
+                    </select>
+                    <div class="tag green" id="staggered-save" style="display: block; text-align: center;">Consumer
+                        Shielded: ₱0.00/L</div>
+                </div>
+
+                <div
+                    style="margin-top: 1.25rem; background: rgba(234, 88, 12, 0.05); padding: 0.75rem; border-radius: 6px; border: 1px solid rgba(234, 88, 12, 0.2);">
+                    <label style="color: var(--brand-accent1);">Importer Retail Margin Health</label>
+                    <div class="stat-value" id="margin-value" style="font-size: 1.2rem;">₱0.00</div>
+                    <div class="tag orange" id="importer-margin"
+                        style="margin-top: 0.25rem; width: 100%; text-align: center;">Pending</div>
+                </div>
+            </div>
+            <!-- Table 2 PB2016-10 Pump Cost Breakdown -->
+            <div
+                style="margin-top: 1.25rem; background: var(--bg-body); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border);">
+                <label style="color: var(--brand-dark); text-transform:uppercase;">Pump Cost Breakdown <span
+                        class="tooltip">ℹ️<span class="tooltiptext">Prorated live derivation of Table 2: CPBRD PB2016-10
+                            Domestic Oil Price Report.</span></span></label>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px solid #ddd; padding-bottom:0.25rem; margin-bottom: 0.25rem; font-weight: bold;">
+                    <span>Component</span><span>Est. Share</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">Tax-Paid Landed (CIF+Taxes)</span><span
+                        id="bd-landed">0%</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">Oil Co. Gross Margin (OCGM)</span><span id="bd-ocgm">0%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">Biofuel Cost</span><span id="bd-bio">0%</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">Logistics (Depot/Haul)</span><span id="bd-log">0%</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">Dealer&apos;s Margin</span><span id="bd-dm">0%</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span
+                        style="color: var(--text-muted)">VAT2 (on markups)</span><span id="bd-vat2">0%</span></div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- SECTION 1: STRAIT OF HORMUZ CRISIS (THE CORE) -->
+            <div class="card crisis-card">
+                <h1 class="crisis">I. Strait of Hormuz Geopolitical Event Simulator</h1>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Roughly one-fifth of global
+                    oil supply and 98% of Philippine Middle-Eastern crude imports transit the Strait. Simulate the
+                    escalating closure event and its devastating multiplier effects.</p>
+
+                <div class="grid-3">
+                    <div class="input-group">
+                        <label>Strait of Hormuz Physical Blockage</label>
+                        <select id="sim-hormuz-block" onchange="calculateAll()"
+                            style="background: rgba(234, 88, 12, 0.05); border-color: var(--brand-accent1); font-weight: 600;">
+                            <option value="0,0">Open (Normal Operations)</option>
+                            <option value="0.25,5">Partial Disruption (Harassment) [+$5/bbl]</option>
+                            <option value="0.50,15">Heavy Military Disruption [+$15/bbl]</option>
+                            <option value="1.0,40">Full Closure (Catastrophic) [+$40/bbl]</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Middle East Dependency %</label>
+                        <div class="slider-cont">
+                            <input type="range" id="sim-me-depend" min="0" max="100" value="98"
+                                oninput="calculateAll()">
+                            <span id="lbl-me-depend" style="font-weight: 700; width: 40px;">98%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Hormuz War Risk Premium %</label>
+                        <select id="sim-warrisk" onchange="calculateAll()">
+                            <option value="0">Standard Lloyds Baseline</option>
+                            <option value="0.02">Escalated Risk (2.0% Value)</option>
+                            <option value="0.05">Extreme War Zone (5.0% Value)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="input-group">
+                        <label>Maritime Reroute (Cape of Good Hope)</label>
+                        <select id="sim-reroute" onchange="calculateAll()">
+                            <option value="0">Direct Transit</option>
+                            <option value="15">Reroute via Africa (+15 Freight Days)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Demand Shift / Panic Hoarding</label>
+                        <select id="sim-hoarding" onchange="calculateAll()">
+                            <option value="1">Stable Demand Pattern</option>
+                            <option value="1.5">Panic Buying (150% Volume Strain)</option>
+                            <option value="0.8">Mass Shift to Public Transpo (-20% Demand)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Global Brent Trigger</label>
+                        <div class="stat-value orange" id="brent-trigger" style="font-size: 1.8rem; text-align: right;">
+                            $0.00 / bbl</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: BIR & DOE ISSUANCES (PHILIPPINE RESPONSE) -->
+            <div class="card gov-card">
+                <h1>II. Joint BIR & DOE Crisis Interventions</h1>
+                <div class="grid-3">
+                    <!-- DOE -->
+                    <div class="input-group">
+                        <label>DOE: PNOC Strategic Reserve Release</label>
+                        <select id="sim-pnoc-spr" onchange="calculateAll()">
+                            <option value="0">Inventory Held (No Action)</option>
+                            <option value="10">Emergency Dump (10 Mil bbls)</option>
+                            <option value="30">Max Dump (30 Mil bbls)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>DOE: Culture of Conservation Order</label>
+                        <select id="sim-conservation" onchange="calculateAll()">
+                            <option value="1.0">No Mandate</option>
+                            <option value="0.85">Work-From-Home Mandate (-15% Vol)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>BOC: Anti-Hoarding Nationwide Audit</label>
+                        <select id="sim-boc" onchange="calculateAll()">
+                            <option value="0">Passive Monitoring</option>
+                            <option value="1">Active Depot Freezes (Smuggle to 0%)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>DOE: Biodiesel (CME) Relaxation</label>
+                        <select id="sim-bio-relax" onchange="calculateAll()">
+                            <option value="1">Standard Mandate</option>
+                            <option value="0.33">Relaxed to 1% Blend</option>
+                            <option value="0">Suspended (0% Blend)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>DOE: Bataan Refinery Surge (180k BPD)</label>
+                        <select id="sim-bataan" onchange="calculateAll()">
+                            <option value="0">Normal Operations</option>
+                            <option value="1">Max Local Refine (Offset Imports)</option>
+                        </select>
+                    </div>
+                    <!-- BIR -->
+                    <div class="input-group" style="grid-column: span 3;">
+                        <label>Presidential Emergency Powers: Excise Suspension (Trigger: Brent > $80)</label>
+                        <select id="sim-train" onchange="calculateAll()"
+                            style="background: rgba(16, 185, 129, 0.1); border-color: var(--brand-safe);">
+                            <option value="1.0">Active Phase 3 (Max Collection)</option>
+                            <option value="0">Auto-Suspend Excise (Emergency Power Executed)</option>
+                            <option value="auto">Dynamic Auto-Suspend (Trigger automatically if Brent > $80)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>BIR RR No. 4-2022: Eco/Freeport Zone VAT</label>
+                        <select id="sim-rr42022" onchange="calculateAll()">
+                            <option value="0.12">Standard Import (12% VAT Applied)</option>
+                            <option value="0">Freeport Exemption (0% VAT)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: COMMERCIAL BUYING MECHANICS (Philippine Context) -->
+            <div class="card">
+                <h1>III. Philippine Physical Import Mechanics (SPA & Logistics)</h1>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">Based on "Buying Oil in
+                    the Philippines Explained" (PSA/DOE) and Asian Specifications. Base prices pegged to internal
+                    trading board (Brent $92.69/bbl, WTI $90.90/bbl).</p>
+                <div class="grid-4">
+                    <div class="input-group">
+                        <label>Base Product Assessment <span class="tooltip">ℹ️<span class="tooltiptext">Live proxies
+                                    for Spot Value. References derived from active trading board.</span></span></label>
+                        <select id="sim-product" onchange="calculateAll()">
+                            <option value="118.02,6.00,0.02,diesel">Diesel Gasoil ($118.02) [from $2.81/gal]</option>
+                            <option value="110.20,10.00,0.10,gas95">Gas 95 RON ($110.20)</option>
+                            <option value="95.34,10.00,0.10,gas91">Gas 91 RON / RBOB ($95.34) [from $2.27/gal]</option>
+                            <option value="99.40,0.00,0.00,jet">Jet A1 ($99.40)</option>
+                            <option value="78.00,0.00,0.00,lpg">LPG Pressurized ($78)</option>
+                            <option value="153.30,0.00,0.00,lube">Heating Oil / Sub ($153.30) [from $3.65/gal]</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Sulfur Spec (Philippine Standard)</label>
+                        <select id="sim-quality" onchange="calculateAll()">
+                            <option value="0">Euro 4 (Max 50ppm) Base</option>
+                            <option value="1.85">Euro 5 (Max 10ppm) +$1.85</option>
+                            <option value="-2.10">Downgrade (Max 500ppm) -$2.10</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Pricing Window Structure</label>
+                        <select id="sim-window" onchange="calculateAll()">
+                            <option value="0">Month's Average (Standard)</option>
+                            <option value="1">5-Day Loading Window</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>SPA Commercial Premium</label>
+                        <div class="slider-cont">
+                            <input type="range" id="sim-premium" min="-2" max="10" step="0.5" value="2"
+                                oninput="calculateAll()">
+                            <span id="lbl-premium" style="font-weight: 700;">+$2.0</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Port of Entry Draft Limit</label>
+                        <select id="sim-port" onchange="calculateAll()">
+                            <option value="1">Batangas/Subic (VLCC / Large) x1.0 Cost</option>
+                            <option value="1.2">Manila/Cebu (MR / Small) x1.2 Fright Multiplier</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Alternate Global Sourcing</label>
+                        <select id="sim-source" onchange="calculateAll()">
+                            <option value="0">Middle East / MOPS Standard</option>
+                            <option value="-15,10">Russian Urals (Discount, High Freight)</option>
+                            <option value="-5,8">US WTI (Pacific Route Penalty)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Port Congestion / Demurrage</label>
+                        <div class="slider-cont">
+                            <input type="range" id="sim-congestion" min="1" max="5" step="0.5" value="1"
+                                oninput="calculateAll()">
+                            <span id="lbl-congestion" style="font-weight: 700; width: 30px;">1.0x</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Wholesale Bulk Markdown (₱/L)</label>
+                        <input type="number" id="sim-wholesale" value="0.50" step="0.10" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group">
+                        <label>BSP Interv. (FX Defense Hike)</label>
+                        <select id="sim-bsp" onchange="calculateAll()">
+                            <option value="0">Current Rates</option>
+                            <option value="1.00">+50 bps Hike (FX +₱1.00 app)</option>
+                            <option value="2.50">+100 bps Hike (FX +₱2.50 app)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Forex Exchange (PHP/USD)</label>
+                        <input type="number" id="sim-forex" value="59.33" step="0.25" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group">
+                        <label>Bank LOC Issuance Fee %</label>
+                        <input type="number" id="sim-locfee" value="0.25" step="0.05" oninput="calculateAll()">
+                    </div>
+                </div>
+                <div class="grid-2"
+                    style="border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.5rem;">
+                    <div class="input-group" style="margin: 0;">
+                        <label>Default Cargo Vol (bbls)</label>
+                        <input type="number" id="sim-volume" value="250000" step="10000" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group" style="margin: 0;">
+                        <label>Dealer Retail Rent/Overhead Margin (₱/L)</label>
+                        <input type="number" id="sim-dealer" value="3.50" step="0.25" oninput="calculateAll()">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- SECTION 4: FULL PUMP PRICE BUILD-UP TABLE -->
+            <div class="card">
+                <h1>IV. Table 2: Tax Paid Landed Cost (TPLC) and Pump Price Build-Up</h1>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">Source: 2012 Report of
+                    the Independent Oil Price Review Committee. Live PHP (₱/L) values are dynamically prorated based on
+                    current simulation boundaries.</p>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: right;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); background: var(--bg-body);">
+                                <th style="text-align: left; padding: 0.5rem; border: 1px solid var(--border);">
+                                    Variables</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border);">% To Total<br>Gasoline
+                                    TPLC</th>
+                                <th
+                                    style="padding: 0.5rem; color: var(--brand-accent1); border: 1px solid var(--border);">
+                                    Gasoline PHP (₱/L)</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border);">% to Total<br>Diesel TPLC
+                                </th>
+                                <th
+                                    style="padding: 0.5rem; color: var(--brand-accent1); border: 1px solid var(--border);">
+                                    Diesel PHP (₱/L)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tplc-tbody">
+                            <!-- Filled by JS -->
+                        </tbody>
+                        <thead>
+                            <tr
+                                style="border-bottom: 2px solid var(--border); border-top: 2px solid var(--border); background: var(--bg-body);">
+                                <th style="text-align: left; padding: 0.5rem; border: 1px solid var(--border);">
+                                    Variables</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border);">% To Total<br>Gasoline
+                                    Pump Price</th>
+                                <th
+                                    style="padding: 0.5rem; color: var(--brand-accent1); border: 1px solid var(--border);">
+                                    Gasoline PHP (₱/L)</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border);">% to Total<br>Diesel Pump
+                                    Price</th>
+                                <th
+                                    style="padding: 0.5rem; color: var(--brand-accent1); border: 1px solid var(--border);">
+                                    Diesel PHP (₱/L)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pump-tbody">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function calculateAll() {
+            // Core Inputs
+            const volInput = parseFloat(document.getElementById('sim-volume').value) || 0;
+            const litersBbl = 158.987;
+            let totalVolBbl = volInput;
+            const forex = parseFloat(document.getElementById('sim-forex').value) || 59.33;
+
+            // Finance & LOC
+            const bspDef = parseFloat(document.getElementById('sim-bsp').value) || 0;
+            const activeForex = forex - bspDef;
+
+            // F.1 Product Base
+            const prodData = document.getElementById('sim-product').value.split(",");
+            const baseMOPS = parseFloat(prodData[0]);
+            const baseExcise = parseFloat(prodData[1]);
+            const baseBioPct = parseFloat(prodData[2]);
+            const prodType = prodData[3];
+
+            let qualityPremium = parseFloat(document.getElementById('sim-quality').value);
+            if (prodType === "lpg" || prodType === "lube") qualityPremium = 0;
+
+            // F.2 Hormuz Logic
+            const hmzData = document.getElementById('sim-hormuz-block').value.split(",");
+            const hmzPct = parseFloat(hmzData[0]);
+            const hmzSqueeze = parseFloat(hmzData[1]);
+
+            const meDepend = parseFloat(document.getElementById('sim-me-depend').value) / 100;
+            document.getElementById('lbl-me-depend').innerText = (meDepend * 100).toFixed(0) + "%";
+
+            // Effective supply squeeze only hits the % we depend on from the Middle East
+            const activeSqueeze = hmzSqueeze * meDepend;
+
+            // Alternate Sourcing
+            const altSourceData = document.getElementById('sim-source').value.split(",");
+            const altDiscount = altSourceData.length > 1 ? parseFloat(altSourceData[0]) : 0;
+            const altFreight = altSourceData.length > 1 ? parseFloat(altSourceData[1]) : 0;
+
+            // Pnoc SPR dump
+            const pnocSpr = parseFloat(document.getElementById('sim-pnoc-spr').value);
+            const pnocOffset = pnocSpr * 0.15; // small global/local price relief
+
+            // Commercial Premium
+            const spaPremium = parseFloat(document.getElementById('sim-premium').value);
+            document.getElementById('lbl-premium').innerText = `+$${spaPremium.toFixed(1)}`;
+
+            // Window logic (arbitrary volatility addition if 5-day is selected during crisis)
+            let windowRisk = 0;
+            if (document.getElementById('sim-window').value === "1" && hmzPct > 0) windowRisk = 3.50;
+
+            // Active Spot Price calculation
+            let activeSpotUsd = baseMOPS + qualityPremium + activeSqueeze - pnocOffset + spaPremium + windowRisk + altDiscount;
+            if (activeSpotUsd < 10) activeSpotUsd = 10;
+
+            // Brent correlates to spot for this sim. We use $92.69 as baseline
+            const brentRef = activeSpotUsd - 25.33; // Spot usually higher than raw Brent, roughly mapping to $92.69 default for Diesel ($118.02)
+            const bTrigEl = document.getElementById('brent-trigger');
+            bTrigEl.innerText = `$${brentRef.toFixed(2)}`;
+            if (brentRef >= 80) bTrigEl.style.color = "var(--brand-accent1)"; else bTrigEl.style.color = "var(--brand-safe)";
+
+            // Demand Shock & Conservation
+            const hoardMult = parseFloat(document.getElementById('sim-hoarding').value);
+            const consMult = parseFloat(document.getElementById('sim-conservation').value);
+            totalVolBbl = totalVolBbl * hoardMult * consMult;
+
+            // Bataan Refinery Surge
+            const bataanSurge = parseInt(document.getElementById('sim-bataan').value);
+            if (bataanSurge === 1) {
+                totalVolBbl = Math.max(10000, totalVolBbl - 180000); // offset physical refined imports
+            }
+
+            const totalLiters = totalVolBbl * litersBbl;
+
+            // SPR Depletion
+            const sprMsg = document.getElementById('spr-countdown');
+            if (pnocSpr > 0 && totalVolBbl > 0) {
+                const days = Math.floor((pnocSpr * 1000000) / totalVolBbl);
+                sprMsg.innerText = `${days} Days Left until Empty`;
+                sprMsg.style.color = "var(--brand-accent1)";
+            } else {
+                sprMsg.innerText = "Inactive";
+                sprMsg.style.color = "var(--text-muted)";
+            }
+
+            // Logistics & Freight
+            const portMult = parseFloat(document.getElementById('sim-port').value);
+            const congestionMult = parseFloat(document.getElementById('sim-congestion').value);
+            document.getElementById('lbl-congestion').innerText = congestionMult.toFixed(1) + "x";
+            const rerouteDays = parseFloat(document.getElementById('sim-reroute').value);
+            const dailyVesselCost = 35000;
+
+            // Base Freight + Reroute
+            let freightRate = (2.50 * portMult) * congestionMult;
+            if (altFreight > 0) freightRate += altFreight;
+            const extraFreight = (rerouteDays * dailyVesselCost) / Math.max(1, totalVolBbl);
+            freightRate += extraFreight;
+
+            const fobUsd = activeSpotUsd * totalVolBbl;
+            const cfrUsd = fobUsd + (freightRate * totalVolBbl);
+
+            // Marine Insurance
+            let insRate = 0.001; // Base
+            const warRiskRate = parseFloat(document.getElementById('sim-warrisk').value);
+            // Only apply war risk to the % coming from ME
+            insRate += (warRiskRate * meDepend);
+            const insUsd = cfrUsd * insRate;
+            const cifUsd = cfrUsd + insUsd;
+
+            // Finance LOC
+            const locFeePct = parseFloat(document.getElementById('sim-locfee').value) / 100;
+            const lcPhp = (cifUsd * locFeePct) * activeForex;
+
+            const dutiablePhp = cifUsd * activeForex;
+
+            // Govt Taxes
+            const dutyRate = 0.03; // assume 3% standard MFN for ME oil
+            const dutyPhp = dutiablePhp * dutyRate;
+
+            // Train Excise
+            let trainSelect = document.getElementById('sim-train').value;
+            let trainPhase = 1.0;
+            if (trainSelect === "0") trainPhase = 0;
+            if (trainSelect === "auto") {
+                trainPhase = brentRef > 80 ? 0 : 1.0;
+            }
+
+            let activeExciseRate = baseExcise * trainPhase;
+            if (baseExcise === 0) activeExciseRate = 0;
+            const excisePhp = totalLiters * activeExciseRate;
+
+            // VAT
+            const vatRate = parseFloat(document.getElementById('sim-rr42022').value);
+            const markingRate = 0.06884;
+            let markingPhp = totalLiters * markingRate;
+            if (prodType === "lpg" || prodType === "jet" || prodType === "lube") markingPhp = 0;
+
+            const vatPhp = (dutiablePhp + dutyPhp + excisePhp + markingPhp) * vatRate;
+
+            // Biofuel Relaxation
+            const bioRelax = parseFloat(document.getElementById('sim-bio-relax').value);
+            let bioCostPhp = 0;
+            if (baseBioPct > 0 && prodType !== "lpg" && prodType !== "lube" && prodType !== "jet") {
+                bioCostPhp = totalLiters * (baseBioPct * bioRelax) * 8.50;
+            }
+
+            const taxesPhp = dutyPhp + excisePhp + markingPhp + vatPhp;
+
+            const totalLandedPhp = dutiablePhp + taxesPhp + lcPhp + bioCostPhp;
+            const landedPerLiter = totalVolBbl > 0 ? totalLandedPhp / totalLiters : 0;
+
+            // Wholesale & Retail Margin
+            const wholesaleDisc = parseFloat(document.getElementById('sim-wholesale').value);
+            const dealerRent = parseFloat(document.getElementById('sim-dealer').value);
+            const grossRetail = landedPerLiter - wholesaleDisc + dealerRent;
+
+            // Staggered DOE Implementation
+            const stagPct = parseFloat(document.getElementById('sim-staggered').value);
+            // Dynamic Baseline Mapping to emulate standard pre-shock pricing based on DOE lower bounds
+            let baselineNorm = 55.00;
+            if (prodType === 'gas91') baselineNorm = 49.00;
+            if (prodType === 'gas95') baselineNorm = 50.00;
+            if (prodType === 'diesel') baselineNorm = 49.00;
+
+            // difference to be hiked
+            const hikeAmount = grossRetail - baselineNorm;
+            let visibleRetail = grossRetail;
+            let unrecoveredMargin = 0;
+
+            if (hikeAmount > 0 && stagPct < 1.0) {
+                const allowedHike = hikeAmount * stagPct;
+                visibleRetail = baselineNorm + allowedHike;
+                unrecoveredMargin = hikeAmount - allowedHike;
+            }
+
+            document.getElementById('staggered-save').innerText = `Consumer Shielded: ₱${Math.max(0, unrecoveredMargin).toFixed(2)}/L`;
+
+            const calcPumpVar = (pmops, pexc, ptype) => {
+                let p_spotUsd = pmops + qualityPremium + activeSqueeze - pnocOffset + spaPremium + windowRisk + altDiscount;
+                if (p_spotUsd < 10) p_spotUsd = 10;
+
+                // Need to use fallback logic if totalLiters = 0 due to Bataan surge 100% replacement
+                const calcLit = Math.max(1000, totalLiters);
+                const calcBbl = Math.max(10, totalVolBbl);
+
+                const p_fobUsd = p_spotUsd * calcBbl;
+                const p_cfrUsd = p_fobUsd + (freightRate * calcBbl);
+                const p_insUsd = p_cfrUsd * insRate;
+                const p_cifUsd = p_cfrUsd + p_insUsd;
+                const p_dutiablePhp = p_cifUsd * activeForex;
+                const p_lcPhp = (p_cifUsd * locFeePct) * activeForex;
+                const p_dutyPhp = p_dutiablePhp * dutyRate;
+                const p_excisePhp = calcLit * (pexc * trainPhase);
+                const p_vatPhp = (p_dutiablePhp + p_dutyPhp + p_excisePhp + markingPhp) * vatRate;
+                let p_bioCostPhp = calcLit * ((ptype.includes('gas') ? 0.10 : 0.02) * bioRelax) * 8.50;
+                const p_totalLandedPhp = p_dutiablePhp + p_dutyPhp + p_excisePhp + markingPhp + p_vatPhp + p_lcPhp + p_bioCostPhp;
+                const p_grossRetail = (p_totalLandedPhp / calcLit) - wholesaleDisc + dealerRent;
+                let p_base = 50.00;
+                if (ptype === 'gas91') p_base = 49.00;
+                if (ptype === 'gas95') p_base = 50.00;
+                if (ptype === 'gas97') p_base = 52.00;
+                if (ptype === 'diesel') p_base = 49.00;
+                if (ptype === 'dieselmax') p_base = 54.00;
+                let p_hike = p_grossRetail - p_base;
+                return (p_hike > 0 && stagPct < 1.0) ? (p_base + p_hike * stagPct) : p_grossRetail;
+            };
+
+            if (document.getElementById('out-v-gas91')) document.getElementById('out-v-gas91').innerText = `₱${calcPumpVar(95.34, 10.00, 'gas91').toFixed(2)}`;
+            if (document.getElementById('out-v-gas95')) document.getElementById('out-v-gas95').innerText = `₱${calcPumpVar(110.20, 10.00, 'gas95').toFixed(2)}`;
+            if (document.getElementById('out-v-gas97')) document.getElementById('out-v-gas97').innerText = `₱${calcPumpVar(115.40, 10.00, 'gas97').toFixed(2)}`;
+            if (document.getElementById('out-v-diesel')) document.getElementById('out-v-diesel').innerText = `₱${calcPumpVar(118.02, 6.00, 'diesel').toFixed(2)}`;
+            if (document.getElementById('out-v-dieselmax')) document.getElementById('out-v-dieselmax').innerText = `₱${calcPumpVar(122.50, 6.00, 'dieselmax').toFixed(2)}`;
+
+            document.getElementById('out-landed').innerText = `₱${visibleRetail.toFixed(2)} / L`;
+            document.getElementById('out-cif-bbl').innerText = `$${(cifUsd / totalVolBbl).toFixed(2)}/bbl`;
+
+            // Jeepney & Subsidy
+            const jeepImpact = (visibleRetail - baselineNorm) * 30; // 30 Liters
+            const jEl = document.getElementById('jeepney-impact');
+            jEl.innerText = jeepImpact >= 0 ? `+₱${Math.abs(jeepImpact).toFixed(2)}` : `-₱${Math.abs(jeepImpact).toFixed(2)}`;
+            jEl.className = jeepImpact >= 0 ? "stat-value orange" : "stat-value green";
+
+            const trackerEl = document.getElementById('pantawid-tracker');
+            if (jeepImpact > 0) {
+                // assume 200,000 drivers * 22 days driving = 4.4M driver-days/month
+                const pantawidCost = (jeepImpact * 4400000) / 1000000;
+                trackerEl.innerText = `₱${pantawidCost.toFixed(1)} Million/month`;
+            } else {
+                trackerEl.innerText = `₱0/month`;
+            }
+
+            // Meralco Generation Charge Ripple (Est 15% generation via diesel, rough ₱0.05/kWh per ₱1/L increase)
+            const meralcoImpact = (visibleRetail - baselineNorm) * 0.05;
+            document.getElementById('meralco-impact').innerText = meralcoImpact > 0 ? `+₱${meralcoImpact.toFixed(2)} / kWh` : `₱0.00 / kWh`;
+
+            // DOE Abiso ng DOE Legal Ceiling Checks
+            const doeCaps = {
+                "diesel": 66.59, // From Abiso ng DOE image
+                "gas95": 71.04,  // From Abiso ng DOE image
+                "gas91": 64.70,  // From Abiso ng DOE image
+                "jet": 999.00,
+                "lpg": 999.00,
+                "lube": 999.00
+            };
+            const activeCap = doeCaps[prodType] || 999.00;
+
+            if (document.getElementById('doe-status')) {
+                const statusEl = document.getElementById('doe-status');
+                const ceilEl = document.getElementById('doe-ceiling-price');
+
+                if (activeCap === 999.00) {
+                    ceilEl.innerText = "Unregulated";
+                    statusEl.className = "tag green";
+                    statusEl.innerText = "Exempt";
+                } else {
+                    ceilEl.innerText = `₱${activeCap.toFixed(2)} Max limit`;
+                    if (visibleRetail > activeCap) {
+                        ceilEl.style.color = "var(--brand-accent1)";
+                        statusEl.className = "tag orange";
+                        statusEl.innerText = `OVERPRICED BY ₱${(visibleRetail - activeCap).toFixed(2)}`;
+                    } else {
+                        ceilEl.style.color = "var(--brand-dark)";
+                        statusEl.className = "tag green";
+                        statusEl.innerText = "Within Regulated Limits";
+                    }
+                }
+            }
+
+            // Inflation
+            const infPct = (visibleRetail - baselineNorm) * 0.06;
+            document.getElementById('inflation-cpi').innerText = infPct > 0 ? `+${infPct.toFixed(2)}%` : `${infPct.toFixed(2)}%`;
+
+            // PB2016-10 Pump Cost Breakdown Proration
+            // We prorate the final visible retail price mimicking Table 2 proportions
+            const isGas = ["gas95", "gas91"].includes(prodType);
+            const ratios = isGas ? { tplc: 0.7268, ocgm: 0.1233, ts: 0.0085, dep: 0.0050, bio: 0.0679, hf: 0.0065, dm: 0.0328, vat2: 0.0293 }
+                : { tplc: 0.8877, ocgm: 0.0193, ts: 0.0112, dep: 0.0066, bio: 0.0269, hf: 0.0043, dm: 0.0320, vat2: 0.0120 };
+
+            // Update sidebar Breakdown %
+            if (document.getElementById('bd-landed')) {
+                document.getElementById('bd-landed').innerText = `${(ratios.tplc * 100).toFixed(2)}% (₱${(visibleRetail * ratios.tplc).toFixed(2)})`;
+                document.getElementById('bd-ocgm').innerText = `${(ratios.ocgm * 100).toFixed(2)}% (₱${(visibleRetail * ratios.ocgm).toFixed(2)})`;
+                document.getElementById('bd-bio').innerText = `${(ratios.bio * 100).toFixed(2)}% (₱${(visibleRetail * ratios.bio).toFixed(2)})`;
+                document.getElementById('bd-log').innerText = `${((ratios.ts + ratios.dep + ratios.hf) * 100).toFixed(2)}% (₱${(visibleRetail * (ratios.ts + ratios.dep + ratios.hf)).toFixed(2)})`;
+                document.getElementById('bd-dm').innerText = `${(ratios.dm * 100).toFixed(2)}% (₱${(visibleRetail * ratios.dm).toFixed(2)})`;
+                document.getElementById('bd-vat2').innerText = `${(ratios.vat2 * 100).toFixed(2)}% (₱${(visibleRetail * ratios.vat2).toFixed(2)})`;
+            }
+
+            // Importer margin
+            // Unrecovered margin from staggering basically destroys importer base profit (dealerRent - wholesale disc)
+            const importerGross = dealerRent - wholesaleDisc;
+            const finalNet = importerGross - unrecoveredMargin;
+            const mEl = document.getElementById('margin-value');
+            const tagEl = document.getElementById('importer-margin');
+            mEl.innerText = `₱${finalNet.toFixed(2)} / L`;
+
+            if (finalNet < 0) {
+                mEl.className = "stat-value orange";
+                tagEl.className = "tag orange"; tagEl.innerText = "Negative (Under-recovery)";
+            } else {
+                mEl.className = "stat-value green";
+                tagEl.className = "tag green"; tagEl.innerText = "Target Profit Met";
+            }
+
+            // ==== TABLE 2 PRORATION GENERATION ====
+            // Data maps corresponding to table values
+            const tplcData = [
+                { name: "FOB (freight on board)", g: 74.67, d: 83.73 },
+                { name: "FRT (ocean freight)", g: 1.49, d: 1.67 },
+                { name: "INS (ocean insurance)", g: 2.99, d: 3.35 },
+                { name: "CIF (cost, insurance and freight)", g: 79.15, d: 88.76, bold: true },
+                { name: "DUT (duties)", g: 0.00, d: 0.00 },
+                { name: "SD (special duties)", g: 0.00, d: 0.00 },
+                { name: "BF (brokerage fee)", g: 0.10, d: 0.11 },
+                { name: "BC (bank charge)", g: 0.10, d: 0.11 },
+                { name: "AC (arrastre cost)", g: 0.20, d: 0.23 },
+                { name: "WF (wharfage fee)", g: 0.06, d: 0.07 },
+                { name: "IPF (import processing fee)", g: 0.00, d: 0.00 },
+                { name: "CDS (customs doc stamp)", g: 0.00, d: 0.00 },
+                { name: "ET (excise tax)", g: 9.68, d: 0.00 },
+                { name: "VAT1 (value-added tax)", g: 10.71, d: 10.71 },
+                { name: "TPLC", g: 100.00, d: 100.00, bold: true }
+            ];
+
+            const pumpData = [
+                { name: "TPLC", g: 72.68, d: 88.77 },
+                { name: "OCGM (oil company gross margin)", g: 12.33, d: 1.93 },
+                { name: "RC (refining cost)", g: 0.00, d: 0.00 },
+                { name: "TS (transshipment cost)", g: 0.85, d: 1.12 },
+                { name: "PC (pipeline cost)", g: 0.00, d: 0.00 },
+                { name: "DEP (depot cost)", g: 0.50, d: 0.66 },
+                { name: "BIO (biofuel cost)", g: 6.79, d: 2.69 },
+                { name: "HF (hauling fee)", g: 0.65, d: 0.43 },
+                { name: "DM (dealer's margin)", g: 3.28, d: 3.20 },
+                { name: "VAT2 (value-added tax)", g: 2.93, d: 1.20 },
+                { name: "PUMP PRICE", g: 100.00, d: 100.00, bold: true }
+            ];
+
+            // TPLC baseline in PHP depending on simulation base product
+            // To be accurate, we will project the current visibleRetail into the tables
+            const targetPumpGas = isGas ? visibleRetail : (50.00 + hikeAmount);
+            const targetPumpDiesel = (!isGas && prodType !== "lpg" && prodType !== "lube" && prodType !== "jet") ? visibleRetail : (49.00 + hikeAmount);
+
+            const targetTplcGas = targetPumpGas * 0.7268;
+            const targetTplcDiesel = targetPumpDiesel * 0.8877;
+
+            let tplcHtml = "";
+            for (let row of tplcData) {
+                const isBold = row.bold ? "font-weight: bold;" : "";
+                tplcHtml += `<tr>
+                    <td style="text-align: left; padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.name}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.g.toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); color: var(--brand-accent1); ${isBold}">₱${((row.g / 100) * targetTplcGas).toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.d.toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); color: var(--brand-accent1); ${isBold}">₱${((row.d / 100) * targetTplcDiesel).toFixed(2)}</td>
+                </tr>`;
+            }
+            if (document.getElementById('tplc-tbody')) document.getElementById('tplc-tbody').innerHTML = tplcHtml;
+
+            let pumpHtml = "";
+            for (let row of pumpData) {
+                const isBold = row.bold ? "font-weight: bold;" : "";
+                pumpHtml += `<tr>
+                    <td style="text-align: left; padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.name}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.g.toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); color: var(--brand-accent1); ${isBold}">₱${((row.g / 100) * targetPumpGas).toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); ${isBold}">${row.d.toFixed(2)}</td>
+                    <td style="padding: 0.4rem; border: 1px solid var(--border); color: var(--brand-accent1); ${isBold}">₱${((row.d / 100) * targetPumpDiesel).toFixed(2)}</td>
+                </tr>`;
+            }
+            if (document.getElementById('pump-tbody')) document.getElementById('pump-tbody').innerHTML = pumpHtml;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateAll();
+        });
+    </script>
+</body>
+
+</html>```
